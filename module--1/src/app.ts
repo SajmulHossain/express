@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import { todosRouter } from "./app/todos/todo.route";
 
 const app: Application = express();
@@ -9,9 +9,24 @@ app.use("/todos", todosRouter);
 
 
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to do app");
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  try {
+    res.send("Welcome to do app"); 
+  } catch (error) {
+    next(error);
+  }
 });
+
+app.use((req: Request, res: Response) => {
+  res.status(404).json({message:"Route not found", status: 404})
+})
+
+app.use((error : any, req: Request, res: Response, next: NextFunction) => {
+  if(error) {
+    console.log("error", error);
+    res.status(400).json({message: "something went wrong! from global error handler"});
+  }
+})
 
 // app.get("/todos", (req: Request, res: Response) => {
 //   const data = fs.readFileSync(filePath, { encoding: "utf-8" });

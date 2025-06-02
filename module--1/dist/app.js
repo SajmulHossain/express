@@ -8,8 +8,22 @@ const todo_route_1 = require("./app/todos/todo.route");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use("/todos", todo_route_1.todosRouter);
-app.get("/", (req, res) => {
-    res.send("Welcome to do app");
+app.get("/", (req, res, next) => {
+    try {
+        res.send("Welcome to do app");
+    }
+    catch (error) {
+        next(error);
+    }
+});
+app.use((req, res) => {
+    res.status(404).json({ message: "Route not found", status: 404 });
+});
+app.use((error, req, res, next) => {
+    if (error) {
+        console.log("error", error);
+        res.status(400).json({ message: "something went wrong! from global error handler" });
+    }
 });
 // app.get("/todos", (req: Request, res: Response) => {
 //   const data = fs.readFileSync(filePath, { encoding: "utf-8" });
